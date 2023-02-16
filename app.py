@@ -12,24 +12,22 @@ from dash.dependencies import Input, Output
 
 from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor
 
-from sim import MarketSim
+from sim import Sim
 from params import make_params
 
 def get_new_data():
     global fig
     while True: #and auction_round < nrounds:
         try:
-            fig = do_round()
+            fig = rosbag_fetch()
             time.sleep(.1)
         except KeyboardInterrupt:
             executor.shutdown()
             exit()
 
-def do_round():
-    global fig, auction_round
-    fig = sim.do_round(auction_round)
-    sim.print_round(auction_round)
-    auction_round += 1
+def rosbag_fetch():
+    global fig
+    fig = sim.do_pandas()
     return fig
 
 
@@ -55,7 +53,7 @@ def make_layout():
 start_time = time.time()     
 auction_round = 1
 global fig
-sim = MarketSim(make_params)
+sim = Sim(make_params)
 fig = sim.fig
 
 app.layout = make_layout
